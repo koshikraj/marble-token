@@ -1,6 +1,6 @@
 pragma solidity 0.5.0;
 
-import "./ERC721Full.sol";
+import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
 
 contract Color is ERC721Full {
   string[] public colors;
