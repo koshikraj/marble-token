@@ -4,7 +4,7 @@ import { SketchPicker } from 'react-color';
 import reactCSS from 'reactcss';
 import getWeb3 from "../utils/getWeb3";
 import './App.css';
-import Art from '../abis/Art.json'
+import Marble from '../abis/Marble.json'
 
 class App extends Component {
 
@@ -18,9 +18,9 @@ class App extends Component {
             account: '',
             contract: null,
             totalSupply: 0,
-            arts: [],
-            artName: 'Art Token ',
-            artBorder: 50,
+            marbles: [],
+            marbleName: 'Marble Token ',
+            marbleBorder: 50,
             showModal: false,
         }
     }
@@ -47,19 +47,19 @@ class App extends Component {
     this.setState({ account: accounts[0] })
 
     const networkId = await web3.eth.net.getId();
-    const networkData = Art.networks[networkId];
+    const networkData = Marble.networks[networkId];
     if(networkData) {
-      const abi = Art.abi;
+      const abi = Marble.abi;
       const address = networkData.address;
       const contract = new web3.eth.Contract(abi, address);
       this.setState({ contract })
       const totalSupply = await contract.methods.totalSupply().call();
-      this.setState({ totalSupply, artName: 'Art Token ' + totalSupply});
-      // Load arts
-      for (var i = 1; i <= totalSupply; i++) {
-        const art = await contract.methods.arts(i - 1).call();
+      this.setState({ totalSupply, marbleName: 'Marble Token ' + totalSupply});
+      // Load Marbles
+      for (let i = 1; i <= totalSupply; i++) {
+        const marble = await contract.methods.marbles(i - 1).call();
         this.setState({
-          arts: [...this.state.arts, art]
+            marbles: [...this.state.marbles, marble]
         })
       }
     } else {
@@ -74,7 +74,7 @@ class App extends Component {
     this.state.contract.methods.mint(color, border, name).send({ from: this.state.account })
     .on('transactionHash', (receipt) => {
       this.setState({
-        arts: [...this.state.arts, {color: color, border: border, name: name}]
+          marbles: [...this.state.marbles, {color: color, border: border, name: name}]
       })
     })
   };
@@ -144,7 +144,7 @@ class App extends Component {
             href="#"
             rel="noopener noreferrer"
           >
-            Art Tokens
+              Marble Tokens
           </a>
             <ul className="navbar-nav px-3">
                 <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
@@ -175,26 +175,26 @@ class App extends Component {
                       <Modal.Body>
                           <form onSubmit={(event) => {
                               event.preventDefault();
-                              this.mint(this.state.selectedColor, 50, this.state.artName)
+                              this.mint(this.state.selectedColor, 50, this.state.marbleName)
                           }}>
 
                               <table>
                               <tr>
                               <td>
                               <tr>
-                                  <td>Art Name:</td>
+                                  <td>Marble Name:</td>
                                   <td>
                                   <input
                                   type='text'
                                   className='form-control mb-1'
-                                  value={this.state.artName}
+                                  value={this.state.marbleName}
                                   onChange={(input) => {
-                                      this.setState({artName: input.target.value})}} />
+                                      this.setState({marbleName: input.target.value})}} />
                                   </td>
                               </tr>
 
                               <tr>
-                                  <td>Art Color:</td>
+                                  <td>Marble Color:</td>
                                   <td>
                                   <div>
                                   <div style={ styles.swatch } onClick={ this.handleClick }>
@@ -210,24 +210,24 @@ class App extends Component {
                               </tr>
 
                                   <tr>
-                                      <td>Art Border:</td>
+                                      <td>Marble Border:</td>
                                       <td>
 
                                           <input
                                               type="range"
                                               min="1"
                                               max="100"
-                                              value={this.state.artBorder}
+                                              value={this.state.marbleBorder}
                                               onChange={(input) => {
                                                   console.log(input.target.value);
-                                                  this.setState({artBorder: input.target.value})}} />
+                                                  this.setState({marbleBorder: input.target.value})}} />
                                       </td>
                                   </tr>
                               </td>
 
                                   <td>
 
-                                      <div className="tokenPreview" style={{ backgroundColor: this.state.selectedColor, borderRadius: parseInt(this.state.artBorder) }}></div>
+                                      <div className="tokenPreview" style={{ backgroundColor: this.state.selectedColor, borderRadius: parseInt(this.state.marbleBorder) }}></div>
 
                                   </td>
 
@@ -247,7 +247,7 @@ class App extends Component {
                           </Button>
                           <Button variant="primary" onClick={() => {
                               this.handleCloseModal();
-                              this.mint(this.state.selectedColor, this.state.artBorder, this.state.artName);
+                              this.mint(this.state.selectedColor, this.state.marbleBorder, this.state.marbleName);
 
                           }}>
                               Mint
@@ -263,13 +263,13 @@ class App extends Component {
           </div>
           <hr/>
           <div className="row text-center">
-            { this.state.arts.map((art, key) => {
+            { this.state.marbles.map((marble, key) => {
 
-                console.log(parseInt(art.border));
+                console.log(parseInt(marble.border));
               return(
                 <div key={key} className="col-md-3 mb-3">
-                  <div className="token" style={{ backgroundColor: art.color, borderRadius: parseInt(art.border) }}></div>
-                  <div>{art.name}</div>
+                  <div className="token" style={{ backgroundColor: marble.color, borderRadius: parseInt(marble.border) }}></div>
+                  <div>{marble.name}</div>
                 </div>
               )
             })}

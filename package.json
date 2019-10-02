@@ -1,7 +1,7 @@
 {
-  "name": "eth-marketplace",
+  "name": "marble-token",
   "version": "0.1.0",
-  "description": "An Ethereum Marketplace",
+  "description": "Marble Token - ERC721 token demo",
   "author": "koshik@consensolabs.com",
   "dependencies": {
     "@openzeppelin/contracts": "^2.3.0",

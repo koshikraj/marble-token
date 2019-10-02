@@ -1,5 +1,5 @@
-const Art = artifacts.require("Art");
+const Marble = artifacts.require("Marble");
 
 module.exports = function(deployer) {
-  deployer.deploy(Art);
+  deployer.deploy(Marble);
 };
