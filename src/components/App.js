@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { SliderPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
+import reactCSS from 'reactcss';
 import getWeb3 from "../utils/getWeb3";
 import './App.css';
 import Color from '../abis/Color.json'
@@ -8,9 +9,11 @@ class App extends Component {
 
 
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             isConnected: false,
+            selectedColor: '#000000',
+            displayColorPicker: false,
             account: '',
             contract: null,
             totalSupply: 0,
@@ -71,7 +74,51 @@ class App extends Component {
     })
   };
 
-  render() {
+    handleClick = () => {
+        this.setState({ displayColorPicker: !this.state.displayColorPicker })
+    };
+
+    handleClose = () => {
+        this.setState({ displayColorPicker: false })
+    };
+
+    handleChange = (color) => {
+        this.setState({ selectedColor: color.hex })
+    };
+
+
+    render() {
+
+      const styles = reactCSS({
+          'default': {
+              color: {
+                  width: '36px',
+                  height: '14px',
+                  borderRadius: '2px',
+                  background: `${ this.state.selectedColor }`,
+              },
+              swatch: {
+                  padding: '5px',
+                  background: '#fff',
+                  borderRadius: '1px',
+                  boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
+                  display: 'inline-block',
+                  cursor: 'pointer',
+              },
+              popover: {
+                  position: 'absolute',
+                  zIndex: '2',
+              },
+              cover: {
+                  position: 'fixed',
+                  top: '0px',
+                  right: '0px',
+                  bottom: '0px',
+                  left: '0px',
+              },
+          },
+      });
+
     return (
       <div>
         <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
@@ -107,9 +154,20 @@ class App extends Component {
                   <input
                     type='text'
                     className='form-control mb-1'
-                    placeholder='e.g. #FFFFFF'
+                    placeholder='#FFFFFF'
+                    value={this.state.selectedColor}
                     ref={(input) => { this.color = input }}
                   />
+                    <div>
+                        <div style={ styles.swatch } onClick={ this.handleClick }>
+                            <div style={ styles.color } />
+                        </div>
+                        { this.state.displayColorPicker ? <div style={ styles.popover }>
+                            <div style={ styles.cover } onClick={ this.handleClose }/>
+                            <SketchPicker color={ this.state.selectedColor } onChange={ this.handleChange } />
+                        </div> : null }
+
+                    </div>
                   <input
                     type='submit'
                     className='btn btn-block btn-primary'
