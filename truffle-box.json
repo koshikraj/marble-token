@@ -8,8 +8,8 @@
     "Compile contracts": "truffle compile",
     "Migrate contracts": "truffle migrate",
     "Test contracts": "truffle test",
-    "Run dev server": "npm run start",
-    "Build for production": "npm run build"
+    "Run dev server": "cd client && npm run start",
+    "Build for production": "cd client && npm run build"
   },
   "hooks": {
     "post-unpack": "npm install"

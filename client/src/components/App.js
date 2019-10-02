@@ -170,7 +170,7 @@ class App extends Component {
                   {/* Modal */}
                   <Modal show={this.state.showModal} onHide={this.handleCloseModal}>
                       <Modal.Header closeButton>
-                          <Modal.Title>Modal heading</Modal.Title>
+                          <Modal.Title>Create a Marble</Modal.Title>
                       </Modal.Header>
                       <Modal.Body>
                           <form onSubmit={(event) => {
