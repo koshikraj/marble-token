@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component }  from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import { SketchPicker } from 'react-color';
 import reactCSS from 'reactcss';
 import getWeb3 from "../utils/getWeb3";
 import './App.css';
-import Color from '../abis/Color.json'
+import Art from '../abis/Art.json'
 
 class App extends Component {
 
@@ -17,7 +18,10 @@ class App extends Component {
             account: '',
             contract: null,
             totalSupply: 0,
-            colors: []
+            arts: [],
+            artName: 'Art Token ',
+            artBorder: 50,
+            showModal: false,
         }
     }
 
@@ -42,20 +46,20 @@ class App extends Component {
     const accounts = await web3.eth.getAccounts()
     this.setState({ account: accounts[0] })
 
-    const networkId = await web3.eth.net.getId()
-    const networkData = Color.networks[networkId]
+    const networkId = await web3.eth.net.getId();
+    const networkData = Art.networks[networkId];
     if(networkData) {
-      const abi = Color.abi;
+      const abi = Art.abi;
       const address = networkData.address;
       const contract = new web3.eth.Contract(abi, address);
       this.setState({ contract })
       const totalSupply = await contract.methods.totalSupply().call();
-      this.setState({ totalSupply });
-      // Load Colors
+      this.setState({ totalSupply, artName: 'Art Token ' + totalSupply});
+      // Load arts
       for (var i = 1; i <= totalSupply; i++) {
-        const color = await contract.methods.colors(i - 1).call();
+        const art = await contract.methods.arts(i - 1).call();
         this.setState({
-          colors: [...this.state.colors, color]
+          arts: [...this.state.arts, art]
         })
       }
     } else {
@@ -63,13 +67,14 @@ class App extends Component {
     }
   }
 
-  mint = (color) => {
+  mint = (color, border, name) => {
         console.log(color);
-    this.state.contract.methods.mint(color).send({ from: this.state.account })
+      console.log(border);
+      console.log(name);
+    this.state.contract.methods.mint(color, border, name).send({ from: this.state.account })
     .on('transactionHash', (receipt) => {
-        console.log('created');
       this.setState({
-        colors: [...this.state.colors, color]
+        arts: [...this.state.arts, {color: color, border: border, name: name}]
       })
     })
   };
@@ -84,6 +89,14 @@ class App extends Component {
 
     handleChange = (color) => {
         this.setState({ selectedColor: color.hex })
+    };
+
+
+    handleCloseModal = () => {
+        this.setState({showModal: false});
+    };
+    handleShowModal = () => {
+        this.setState({showModal: true});
     };
 
 
@@ -119,6 +132,10 @@ class App extends Component {
           },
       });
 
+
+
+
+
     return (
       <div>
         <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
@@ -127,7 +144,7 @@ class App extends Component {
             href="#"
             rel="noopener noreferrer"
           >
-            Color Tokens
+            Art Tokens
           </a>
             <ul className="navbar-nav px-3">
                 <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
@@ -145,50 +162,121 @@ class App extends Component {
           <div className="row">
             <main role="main" className="col-lg-12 d-flex text-center">
               <div className="content mr-auto ml-auto">
-                <h1>Issue Token</h1>
-                <form onSubmit={(event) => {
-                  event.preventDefault()
-                  const color = this.color.value
-                  this.mint(color)
-                }}>
-                  <input
-                    type='text'
-                    className='form-control mb-1'
-                    placeholder='#FFFFFF'
-                    value={this.state.selectedColor}
-                    ref={(input) => { this.color = input }}
-                  />
-                    <div>
-                        <div style={ styles.swatch } onClick={ this.handleClick }>
-                            <div style={ styles.color } />
-                        </div>
-                        { this.state.displayColorPicker ? <div style={ styles.popover }>
-                            <div style={ styles.cover } onClick={ this.handleClose }/>
-                            <SketchPicker color={ this.state.selectedColor } onChange={ this.handleChange } />
-                        </div> : null }
 
-                    </div>
-                  <input
-                    type='submit'
-                    className='btn btn-block btn-primary'
-                    value='MINT'
-                  />
-                </form>
+                  <Button variant="primary" onClick={this.handleShowModal}>
+                      Issue Token
+                  </Button>
+
+                  {/* Modal */}
+                  <Modal show={this.state.showModal} onHide={this.handleCloseModal}>
+                      <Modal.Header closeButton>
+                          <Modal.Title>Modal heading</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                          <form onSubmit={(event) => {
+                              event.preventDefault();
+                              this.mint(this.state.selectedColor, 50, this.state.artName)
+                          }}>
+
+                              <table>
+                              <tr>
+                              <td>
+                              <tr>
+                                  <td>Art Name:</td>
+                                  <td>
+                                  <input
+                                  type='text'
+                                  className='form-control mb-1'
+                                  value={this.state.artName}
+                                  onChange={(input) => {
+                                      this.setState({artName: input.target.value})}} />
+                                  </td>
+                              </tr>
+
+                              <tr>
+                                  <td>Art Color:</td>
+                                  <td>
+                                  <div>
+                                  <div style={ styles.swatch } onClick={ this.handleClick }>
+                                      <div style={ styles.color } />
+                                  </div>
+                                  { this.state.displayColorPicker ? <div style={ styles.popover }>
+                                      <div style={ styles.cover } onClick={ this.handleClose }/>
+                                      <SketchPicker color={ this.state.selectedColor } onChange={ this.handleChange } />
+                                  </div> : null }
+
+                                    </div>
+                                  </td>
+                              </tr>
+
+                                  <tr>
+                                      <td>Art Border:</td>
+                                      <td>
+
+                                          <input
+                                              type="range"
+                                              min="1"
+                                              max="100"
+                                              value={this.state.artBorder}
+                                              onChange={(input) => {
+                                                  console.log(input.target.value);
+                                                  this.setState({artBorder: input.target.value})}} />
+                                      </td>
+                                  </tr>
+                              </td>
+
+                                  <td>
+
+                                      <div className="tokenPreview" style={{ backgroundColor: this.state.selectedColor, borderRadius: parseInt(this.state.artBorder) }}></div>
+
+                                  </td>
+
+                              </tr>
+
+                              </table>
+                          </form>
+
+
+
+
+
+                      </Modal.Body>
+                      <Modal.Footer>
+                          <Button variant="secondary" onClick={this.handleCloseModal}>
+                              Close
+                          </Button>
+                          <Button variant="primary" onClick={() => {
+                              this.handleCloseModal();
+                              this.mint(this.state.selectedColor, this.state.artBorder, this.state.artName);
+
+                          }}>
+                              Mint
+                          </Button>
+                      </Modal.Footer>
+                  </Modal>
+
+
+
+
               </div>
             </main>
           </div>
           <hr/>
           <div className="row text-center">
-            { this.state.colors.map((color, key) => {
+            { this.state.arts.map((art, key) => {
+
+                console.log(parseInt(art.border));
               return(
                 <div key={key} className="col-md-3 mb-3">
-                  <div className="token" style={{ backgroundColor: color }}></div>
-                  <div>{color}</div>
+                  <div className="token" style={{ backgroundColor: art.color, borderRadius: parseInt(art.border) }}></div>
+                  <div>{art.name}</div>
                 </div>
               )
             })}
           </div>
         </div>
+
+
       </div>
     );
   }
