@@ -22,7 +22,7 @@ First ensure you are in a new and empty directory.
 2. Alternatively, you can install Truffle globally and run the `unbox` command.
     ```javascript
     npm install -g truffle
-    truffle unbox react
+    truffle unbox koshikraj/marble-token
     ```
 
 3. Compile and migrate the smart contracts using truffle.
