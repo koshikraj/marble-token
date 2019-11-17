@@ -4,14 +4,14 @@ import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
 
 contract Marble is ERC721Full {
 
-  struct Marble {
+  struct MarbleRep {
     string color;
     uint border;
     string name;
 
   }
 
-  Marble[] public marbles;
+  MarbleRep[] public marbles;
 
   mapping(string => bool) _marbleExists;
 
@@ -23,7 +23,7 @@ contract Marble is ERC721Full {
 
     require(!_marbleExists[name]);
 
-    Marble memory marble = Marble(color, border, name);
+    MarbleRep memory marble = MarbleRep(color, border, name);
     uint id = marbles.push(marble);
 
     _mint(msg.sender, id);
