@@ -8,6 +8,7 @@
     "Compile contracts": "truffle compile",
     "Migrate contracts": "truffle migrate",
     "Test contracts": "truffle test",
+    "Setup client": "cd client && npm install",
     "Run dev server": "cd client && npm run start",
     "Build for production": "cd client && npm run build"
   },
